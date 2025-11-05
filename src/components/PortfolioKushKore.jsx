@@ -216,7 +216,7 @@ const GradientOrbs = () => (
 );
 
 /* TopBar */
-const TopBar = ({ onToggleTheme, isDark }) => {
+const TopBar = ({ onToggleTheme, isDark, onOpenResumeNote }) => {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
@@ -244,13 +244,13 @@ const TopBar = ({ onToggleTheme, isDark }) => {
               {n.label}
             </a>
           ))}
-          <a
-            href="/resume/KushKoreResume.pdf"
+          {/* Résumé now shows a tiny note box */}
+          <button
+            onClick={onOpenResumeNote}
             className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-4 py-2 text-sm font-semibold text-white shadow hover:brightness-110"
-            download
           >
             <Download className="h-4 w-4" /> Résumé
-          </a>
+          </button>
           <button
             aria-label="Toggle theme"
             onClick={onToggleTheme}
@@ -543,10 +543,38 @@ export default function PortfolioKushKore() {
   const { theme, setTheme } = useTheme();
   const isDark = theme === "dark";
 
+  // tiny note box toggle
+  const [showResumeNote, setShowResumeNote] = React.useState(false);
+
   return (
     <main className="relative min-h-screen bg-white text-gray-900 dark:bg-ink dark:text-white">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 [background:radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px] opacity-20 dark:opacity-10" />
-      <TopBar onToggleTheme={() => setTheme(isDark ? "light" : "dark")} isDark={isDark} />
+      <TopBar
+        onToggleTheme={() => setTheme(isDark ? "light" : "dark")}
+        isDark={isDark}
+        onOpenResumeNote={() => setShowResumeNote(true)}
+      />
+
+      {/* Small note box for résumé */}
+      {showResumeNote && (
+        <div className="fixed top-16 right-4 z-[60]">
+          <div className="rounded-xl border border-white/15 bg-white/90 px-4 py-3 text-sm shadow-lg backdrop-blur dark:bg-zinc-900/90">
+            <div>
+              For résumé, mail me at{" "}
+              <a className="underline" href={`mailto:${PROFILE.email}`}>{PROFILE.email}</a>.
+            </div>
+            <div className="mt-2 text-right">
+              <button
+                onClick={() => setShowResumeNote(false)}
+                className="rounded-lg border border-white/15 px-3 py-1 text-xs hover:bg-white/10"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header id="home" className="relative">
         <GradientOrbs />
       </header>
